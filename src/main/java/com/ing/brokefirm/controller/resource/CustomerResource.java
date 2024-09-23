@@ -1,4 +1,4 @@
-package com.ing.brokefirm.controller.OrderResource;
+package com.ing.brokefirm.controller.resource;
 
 import lombok.Data;
 

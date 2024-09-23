@@ -1,4 +1,4 @@
-package com.ing.brokefirm.controller.OrderResource;
+package com.ing.brokefirm.controller.resource;
 
 import com.ing.brokefirm.enums.OrderSide;
 import com.ing.brokefirm.enums.OrderStatus;

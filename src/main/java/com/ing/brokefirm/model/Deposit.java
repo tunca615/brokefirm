@@ -14,4 +14,5 @@ import java.math.BigDecimal;
 public class Deposit {
     private Long customerId;
     private BigDecimal amount;
+    private Long version;
 }

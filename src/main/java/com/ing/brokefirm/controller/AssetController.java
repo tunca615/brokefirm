@@ -1,15 +1,16 @@
 package com.ing.brokefirm.controller;
 
-import com.ing.brokefirm.controller.OrderResource.AssetResource;
+import com.ing.brokefirm.controller.resource.AssetResource;
 import com.ing.brokefirm.controller.command.DepositCommand;
 import com.ing.brokefirm.controller.command.WithdrawCommand;
 import com.ing.brokefirm.mapper.AssetMapper;
 import com.ing.brokefirm.model.Asset;
 import com.ing.brokefirm.service.IAssetService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -20,17 +21,19 @@ public class AssetController {
     private final AssetMapper mapper;
 
     @PostMapping("/deposit")
-    public void depositMoney(@RequestBody DepositCommand depositCommand, Principal principal) {
-        assetService.depositMoney(mapper.depositCommandToDeposit(depositCommand), principal);
+    @PreAuthorize("hasRole('ADMIN')")
+    public void depositMoney(@RequestBody DepositCommand depositCommand) {
+        assetService.depositMoney(mapper.depositCommandToDeposit(depositCommand));
     }
 
     @PostMapping("/withdraw")
-    public void withdrawMoney(@RequestBody WithdrawCommand withdrawCommand, Principal principal) {
-        assetService.withdrawMoney(mapper.withdrawCommandToDeposit(withdrawCommand), principal);
+    @PreAuthorize("hasRole('ADMIN')")
+    public void withdrawMoney(@RequestBody WithdrawCommand withdrawCommand) {
+        assetService.withdrawMoney(mapper.withdrawCommandToDeposit(withdrawCommand));
     }
 
     @GetMapping
-    public List<AssetResource> listAssets(@RequestParam(required = false) Long customerId, Principal principal) {
+    public List<AssetResource> listAssets(@RequestParam(required = false) Long customerId, UsernamePasswordAuthenticationToken principal) {
         List<Asset> assets = assetService.listAssetsByCustomerId(customerId, principal);
         return assets.stream().map(mapper::assetToAssetResource).toList();
     }

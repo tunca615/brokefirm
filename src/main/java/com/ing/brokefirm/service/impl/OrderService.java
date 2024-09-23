@@ -6,15 +6,15 @@ import com.ing.brokefirm.exception.InsufficientBalanceException;
 import com.ing.brokefirm.mapper.OrderMapper;
 import com.ing.brokefirm.model.Asset;
 import com.ing.brokefirm.model.Customer;
-import com.ing.brokefirm.model.Deposit;
 import com.ing.brokefirm.model.Order;
 import com.ing.brokefirm.repository.OrderRepository;
 import com.ing.brokefirm.repository.entity.OrderEntity;
 import com.ing.brokefirm.service.IOrderService;
+import com.ing.brokefirm.util.Util;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,9 +26,9 @@ public class OrderService implements IOrderService {
     private final OrderMapper orderMapper;
     private final CustomerService customerService;
 
-    public Order createOrder(Order order, Principal principal) {
-        Customer customer = customerService.findByUsername(principal.getName());
-        if(!customer.getRole().equals("ADMIN")){
+    public Order createOrder(Order order, UsernamePasswordAuthenticationToken principal) {
+        if (Util.isAdmin(principal)) {
+            Customer customer = customerService.findByUsername(principal.getName());
             order.setCustomerId(customer.getId());
         }
         validateAssetName(order);
@@ -36,6 +36,7 @@ public class OrderService implements IOrderService {
         List<Asset> assetList = assetService.listAssetsByCustomerIdAndAssetName(order.getCustomerId(), order.getAssetName());
         validateAsset(order, assetList);
 
+        assetService.blockSize(order.getCustomerId(), order.getAssetName(), order.totalAmount());
         return orderMapper.orderEntityToOrder(orderRepository.save(orderMapper.orderToOrderEntity(order)));
     }
 
@@ -54,27 +55,27 @@ public class OrderService implements IOrderService {
         }
     }
 
-    public List<Order> listOrders(Long customerId, LocalDateTime startDate, LocalDateTime endDate, Principal principal) {
+    public List<Order> listOrders(Long customerId, LocalDateTime startDate, LocalDateTime endDate, UsernamePasswordAuthenticationToken principal) {
         Customer customer = customerService.findByUsername(principal.getName());
-        if(!customer.getRole().equals(Constant.ADMIN)){
+        if (!customer.getRole().equals(Constant.ADMIN)) {
             customerId = customer.getId();
         }
         return orderRepository.findByCustomerIdAndCreateDateBetween(customerId, startDate, endDate).stream().map(orderMapper::orderEntityToOrder).toList();
     }
 
-    public void cancelOrder(Long orderId, Principal principal) {
+    public void cancelOrder(Long orderId, UsernamePasswordAuthenticationToken principal) {
         OrderEntity orderEntity = orderRepository.findById(orderId).orElseThrow(() -> new InsufficientBalanceException("Order Id do not have this system"));
         Order order = orderMapper.orderEntityToOrder(orderEntity);
 
         validateCancelOrder(principal, order);
 
         order.setStatus(OrderStatus.CANCELED);
-        assetService.depositMoney(Deposit.builder().amount(order.totalAmount()).customerId(order.getCustomerId()).build(), principal);
+        assetService.releaseSize(order.getCustomerId(), order.getAssetName(), order.totalAmount());
     }
 
-    private void validateCancelOrder(Principal principal, Order order) {
+    private void validateCancelOrder(UsernamePasswordAuthenticationToken principal, Order order) {
         Customer customer = customerService.findByUsername(principal.getName());
-        if(!order.getCustomerId().equals(customer.getId()) && !customer.getRole().equals(Constant.ADMIN)){
+        if (!order.getCustomerId().equals(customer.getId()) && !customer.getRole().equals(Constant.ADMIN)) {
             throw new IllegalArgumentException("Order Id do not have this system");
         }
         if (order.getStatus().equals(OrderStatus.PENDING)) {

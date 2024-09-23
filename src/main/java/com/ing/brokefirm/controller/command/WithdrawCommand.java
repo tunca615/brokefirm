@@ -9,4 +9,5 @@ public class WithdrawCommand {
     private Long customerId;
     private BigDecimal amount;
     private String iban;
+    private Long version;
 }

@@ -20,4 +20,7 @@ public class AssetEntity {
     private String assetName;
     private BigDecimal size;
     private BigDecimal usableSize;
+
+    @Version
+    private Long version;
 }

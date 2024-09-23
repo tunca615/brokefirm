@@ -1,6 +1,6 @@
 package com.ing.brokefirm.mapper;
 
-import com.ing.brokefirm.controller.OrderResource.AssetResource;
+import com.ing.brokefirm.controller.resource.AssetResource;
 import com.ing.brokefirm.controller.command.DepositCommand;
 import com.ing.brokefirm.controller.command.WithdrawCommand;
 import com.ing.brokefirm.model.Asset;

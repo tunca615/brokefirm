@@ -8,4 +8,5 @@ import java.math.BigDecimal;
 public class DepositCommand {
     private Long customerId;
     private BigDecimal amount;
+    private Long version;
 }

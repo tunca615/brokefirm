@@ -1,6 +1,6 @@
 package com.ing.brokefirm.mapper;
 
-import com.ing.brokefirm.controller.OrderResource.OrderResource;
+import com.ing.brokefirm.controller.resource.OrderResource;
 import com.ing.brokefirm.controller.dto.OrderDto;
 import com.ing.brokefirm.model.Order;
 import com.ing.brokefirm.repository.entity.OrderEntity;

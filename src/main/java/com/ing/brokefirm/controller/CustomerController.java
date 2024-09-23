@@ -1,15 +1,15 @@
 package com.ing.brokefirm.controller;
 
-import com.ing.brokefirm.controller.OrderResource.CustomerResource;
+import com.ing.brokefirm.controller.resource.CustomerResource;
 import com.ing.brokefirm.controller.command.CustomerCommand;
 import com.ing.brokefirm.mapper.CustomerMapper;
 import com.ing.brokefirm.model.Customer;
 import com.ing.brokefirm.service.ICustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -26,7 +26,7 @@ public class CustomerController {
     }
 
     @GetMapping("/me")
-    public CustomerResource getCurrentCustomer(Principal principal) {
+    public CustomerResource getCurrentCustomer(UsernamePasswordAuthenticationToken principal) {
         String username = principal.getName();
         Customer customer = customerService.findByUsername(username);
         if (customer == null) {
