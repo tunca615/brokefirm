@@ -62,7 +62,7 @@ public class AssetService implements IAssetService {
     }
 
     public void blockSize(Long customerId, String assetName, BigDecimal size) {
-        List<Asset> assetList = listAssetsByCustomerIdAndAssetName(customerId, assetName);
+        List<Asset> assetList = listAssetsByCustomerIdAndAssetName(customerId, "TRY");
         if (assetList.isEmpty() || assetList.get(0).getUsableSize().compareTo(size) < 0) {
             throw new IllegalArgumentException(String.format("Customer do not have enough %s", assetName));
         }

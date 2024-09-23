@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class OrderEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long customerId;

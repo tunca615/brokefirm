@@ -118,7 +118,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \"customerId\":\"\",\r\n    \"assetName\":\"\",\r\n    \"orderSide\":\"\",\r\n    \"size\":\"\",\r\n    \"price\": \"\",\r\n    \"status\": \"\",\r\n    \"createDate\":\"\"\r\n}",
+									"raw": "{\r\n    \"customerId\":\"\",\r\n    \"assetName\":\"\",\r\n    \"orderSide\":\"\",\r\n    \"size\":\"\",\r\n    \"price\": \"\"\r\n}",
 									"options": {
 										"raw": {
 											"language": "json"

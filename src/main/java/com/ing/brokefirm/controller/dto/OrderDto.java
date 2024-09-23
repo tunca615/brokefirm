@@ -14,6 +14,4 @@ public class OrderDto {
     private OrderSide orderSide;
     private BigDecimal size;
     private BigDecimal price;
-    private OrderStatus status;
-    private LocalDateTime createDate;
 }

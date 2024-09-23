@@ -1,6 +1,7 @@
 package com.ing.brokefirm.service.impl;
 
 import com.ing.brokefirm.constant.Constant;
+import com.ing.brokefirm.enums.OrderSide;
 import com.ing.brokefirm.enums.OrderStatus;
 import com.ing.brokefirm.exception.InsufficientBalanceException;
 import com.ing.brokefirm.mapper.OrderMapper;
@@ -31,27 +32,26 @@ public class OrderService implements IOrderService {
             Customer customer = customerService.findByUsername(principal.getName());
             order.setCustomerId(customer.getId());
         }
-        validateAssetName(order);
 
-        List<Asset> assetList = assetService.listAssetsByCustomerIdAndAssetName(order.getCustomerId(), order.getAssetName());
-        validateAsset(order, assetList);
-
-        assetService.blockSize(order.getCustomerId(), order.getAssetName(), order.totalAmount());
-        return orderMapper.orderEntityToOrder(orderRepository.save(orderMapper.orderToOrderEntity(order)));
-    }
-
-    private static void validateAssetName(Order order) {
-        if (!order.getAssetName().equals(Constant.TRY)) {
-            throw new IllegalArgumentException("Only support TRY asset name");
+        if(order.getOrderSide().equals(OrderSide.SELL)){
+            List<Asset> assetList = assetService.listAssetsByCustomerIdAndAssetName(order.getCustomerId(), order.getAssetName());
+            validateAsset(order, assetList);
         }
+
+        order.setStatus(OrderStatus.PENDING);
+        order.setCreateDate(LocalDateTime.now());
+        if(order.getOrderSide().equals(OrderSide.BUY)){
+            assetService.blockSize(order.getCustomerId(), order.getAssetName(), order.totalAmount());
+        }
+        return orderMapper.orderEntityToOrder(orderRepository.save(orderMapper.orderToOrderEntity(order)));
     }
 
     private static void validateAsset(Order order, List<Asset> assetList) {
         if (assetList.isEmpty()) {
-            throw new IllegalArgumentException(String.format("Customer do not have '%s' asset name", order.getAssetName()));
+            throw new IllegalArgumentException(String.format("Customer do not have '%s' asset", order.getAssetName()));
         }
         if (assetList.get(0).getUsableSize().compareTo(order.totalAmount()) < 0) {
-            throw new IllegalArgumentException("Customer do not have enough usable money");
+            throw new IllegalArgumentException("Customer do not have enough sellable asset");
         }
     }
 
